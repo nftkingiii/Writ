@@ -212,11 +212,17 @@ async function ensureChain() {
   try {
     await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0xb626" }] });
   } catch (e) {
-    if (e.code !== 4902) throw e;
+    // Wallets disagree on the "unknown chain" error code (4902, -32603, nested data), so any failure other
+    // than a user rejection falls through to adding the chain, which also switches to it in most wallets.
+    if (e.code === 4001) throw e;
     await window.ethereum.request({
       method: "wallet_addEthereumChain",
       params: [{ chainId: "0xb626", chainName: chain.name, nativeCurrency: chain.nativeCurrency, rpcUrls: chain.rpcUrls.default.http, blockExplorerUrls: [chain.blockExplorers.default.url] }],
     });
+    const now = await window.ethereum.request({ method: "eth_chainId" });
+    if (parseInt(now, 16) !== chain.id) {
+      await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: "0xb626" }] });
+    }
   }
 }
 
@@ -226,6 +232,11 @@ $("#wallet").addEventListener("click", async () => {
     [account] = await window.ethereum.request({ method: "eth_requestAccounts" });
     wallet = createWalletClient({ account, chain, transport: custom(window.ethereum) });
     walletLabel();
+    try {
+      await ensureChain();
+    } catch (e) {
+      $("#owner-result").innerHTML = `<p class="err">Could not switch to Robinhood Chain Testnet: ${esc(e.shortMessage || e.message)}</p>`;
+    }
     await loadState();
   } catch (e) {
     alert(e.shortMessage || e.message);
