@@ -182,7 +182,7 @@ function pending(i, context) {
 function renderVerdict(r, context) {
   const o = r.output;
   const kind = r.outcome.kind;
-  const label = { executed: "Executed", refused: r.call && r.call.ticker && !r.call.title ? "Held" : "Refused by SERV", blocked: "Blocked by vault", error: "Not recorded" }[kind];
+  const label = { executed: "Executed", refused: r.serv?.guarded ? "Refused by SERV guard" : r.call && r.call.ticker && !r.call.title ? "Held" : "Refused by SERV", blocked: "Blocked by vault", error: "Not recorded" }[kind];
   const trade = o.action === "swap" ? `${esc(o.amountIn)} ${esc(o.tokenIn)} → ${kind === "executed" ? fmt(r.outcome.amountOut, 6) + " " : ""}${esc(o.tokenOut)}` : "No trade";
   const tx = r.outcome.tx;
   $("#decision-body").innerHTML = `
@@ -300,7 +300,7 @@ async function loadLedger() {
   $("#ledger").innerHTML = rows
     .map(
       (r) => `<article class="entry">
-      <div class="when"><span class="stamp ${r.kind}">${label[r.kind]}</span><span>Block ${r.blockNumber}</span><span>Mandate v${r.mandateVersion}</span></div>
+      <div class="when"><span class="stamp ${r.kind}">${r.guarded ? "Guarded" : label[r.kind]}</span><span>Block ${r.blockNumber}</span><span>Mandate v${r.mandateVersion}</span></div>
       <div>
         <div class="what">${r.kind === "executed" ? `${fmt(r.amountIn, 6)} ${esc(r.tokenIn)} → ${fmt(r.amountOut, 6)} ${esc(r.tokenOut)}` : "No trade"}</div>
         <p class="why">${esc(r.rationale)}</p>

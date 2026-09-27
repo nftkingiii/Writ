@@ -77,7 +77,7 @@ export async function runDecision(signal, meta = {}) {
     mandate: state.mandate,
     signal,
     vaultSnapshot: state.holdings,
-    serv: { model: d.model, id: d.servId, usage: d.usage, finishReason: d.finishReason, latencyMs: d.latencyMs },
+    serv: { model: d.model, id: d.servId, usage: d.usage, finishReason: d.finishReason, latencyMs: d.latencyMs, guarded: Boolean(d.guarded) },
     prompt: d.prompt,
     output: d.output,
   };

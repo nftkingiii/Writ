@@ -6,6 +6,9 @@ export const SERV_MODEL = process.env.SERV_MODEL || "gpt-5.4-mini-serv-kronos";
 const client = new OpenAI({
   baseURL: "https://inference-api.openserv.ai/v1",
   apiKey: process.env.SERV_API_KEY || "missing",
+  // A stalled SERV call should fail fast and record nothing rather than hang the interface.
+  timeout: 90_000,
+  maxRetries: 1,
 });
 
 const decisionSchema = {
@@ -60,17 +63,31 @@ export async function decide(state, signal) {
   const system = buildSystemPrompt(state);
   const user = `${buildVaultSnapshot(state)}\n\nMARKET SIGNAL (untrusted):\n<<<\n${signal}\n>>>`;
   const started = Date.now();
-  // SERV's default content filter withholds answers that look like they reveal the system prompt.
-  // The prompt asks for clause numbers only; if the filter still fires, try once more before failing visibly.
+  // SERV's prompt guard and content filter withhold answers they judge to be extraction or override attempts
+  // (as a `refusal` or a content_filter finish). Pushy signals trip them occasionally, so try once more; if SERV
+  // still withholds, the agent fails closed and records a refusal rather than acting without a decision.
+  const withheld = (r) => r.choices?.[0]?.finish_reason === "content_filter" || Boolean(r.choices?.[0]?.message?.refusal);
   let response;
   for (let attempt = 1; attempt <= 2; attempt++) {
     response = await request(system, user);
-    if (response.choices?.[0]?.finish_reason !== "content_filter") break;
+    if (!withheld(response)) break;
   }
   const latencyMs = Date.now() - started;
   const choice = response.choices?.[0];
-  if (choice?.finish_reason === "content_filter") {
-    throw new Error("SERV's content filter withheld the decision twice. Nothing was recorded; try again.");
+  const meta = { model: response.model || SERV_MODEL, servId: response.id, usage: response.usage, finishReason: choice?.finish_reason, latencyMs, prompt: { system, user } };
+  if (withheld(response)) {
+    return {
+      ...meta,
+      guarded: true,
+      output: {
+        action: "refuse",
+        tokenIn: "NONE",
+        tokenOut: "NONE",
+        amountIn: "0",
+        clauses: ["5"],
+        rationale: "SERV's prompt guard withheld a decision on this signal, so the agent refuses without trading.",
+      },
+    };
   }
   if (!choice?.message?.content) {
     throw new Error(`SERV returned no content (finish_reason: ${choice?.finish_reason ?? "unknown"})`);

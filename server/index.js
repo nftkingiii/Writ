@@ -192,6 +192,7 @@ app.get("/api/decisions", async (_req, res) => {
         call: rec?.call ?? null,
         signal: rec?.kind === "signal" ? rec.signal : null,
         clauses: rec?.output?.clauses ?? null,
+        guarded: Boolean(rec?.serv?.guarded),
         blockNumber: Number(l.blockNumber),
         tx: l.transactionHash,
         url: `${EXPLORER}/tx/${l.transactionHash}`,
