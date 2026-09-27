@@ -108,7 +108,7 @@ button[disabled] { opacity: .5; cursor: progress; }
 .call:hover { border-color: var(--line-2); }
 .c-head { display: flex; align-items: center; gap: 10px; }
 .av { position: relative; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font: 600 10px var(--mono); color: #fff; flex: none; overflow: hidden; }
-.av img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #fff; }
+.av img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #fff; padding: 6px; }
 .c-who { flex: 1; min-width: 0; }
 .c-who b { font-weight: 600; }
 .c-who span { display: block; color: var(--ink-3); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

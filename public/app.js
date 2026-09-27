@@ -10,14 +10,9 @@ const ago = (iso) => {
 };
 const COLORS = { WETH: "#5b5670", TSLA: "#c2413f", AMZN: "#c8812b", NFLX: "#8f1d2c", AMD: "#2e6f9e", PLTR: "#3a3a44" };
 const NAMES = { WETH: "Wrapped Ether", TSLA: "Tesla", AMZN: "Amazon", NFLX: "Netflix", AMD: "AMD", PLTR: "Palantir" };
-// Official Robinhood Stock Token logos (api.robinhood.com/rhj/assets) and the WETH logo from Trust Wallet's asset list.
-const RH = "https://cdn.robinhood.com/ncw_assets/logos/";
+// Company logos by ticker from Financial Modeling Prep's public image endpoint, and the WETH logo from Trust Wallet's asset list.
 const LOGOS = {
-  TSLA: `${RH}0x322f0929c4625ed5bad873c95208d54e1c003b2d.png`,
-  AMZN: `${RH}0x12f190a9f9d7d37a250758b26824b97ce941bf54.png`,
-  NFLX: `${RH}0xe0444ef8bf4ed74f74fd73686e2ddf4c1c5591e8.png`,
-  AMD: `${RH}0x86923f96303d656e4aa86d9d42d1e57ad2023fdc.png`,
-  PLTR: `${RH}0x894e1ec2d74ffe5aef8dc8a9e84686accb964f2a.png`,
+  ...Object.fromEntries(["TSLA", "AMZN", "NFLX", "AMD", "PLTR"].map((t) => [t, `https://financialmodelingprep.com/image-stock/${t}.png`])),
   WETH: "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png",
 };
 const av = (sym) =>
