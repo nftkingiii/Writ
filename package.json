@@ -1,0 +1,22 @@
+{
+  "name": "writ",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A trading agent that can only act within its writ: SERV reasons over an onchain mandate, the vault enforces it on Robinhood Chain.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server/index.js",
+    "abi": "node server/export-abi.js",
+    "dev:fork": "node --env-file=.env.fork server/index.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^18.0.4",
+    "express": "^5.2.1",
+    "openai": "^7.23.0",
+    "viem": "^2.56.9"
+  }
+}
