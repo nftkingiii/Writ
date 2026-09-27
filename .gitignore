@@ -1,0 +1,12 @@
+node_modules/
+.env
+.env.*
+!.env.example
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+HACK_EVENT_GATE.json
+PROJECT_STATE.md
+SOURCES.md
+*.log
+dist/
