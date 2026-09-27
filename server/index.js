@@ -9,9 +9,9 @@ import { FEED_MODEL, callsFor, findCall, getCalls } from "./feed.js";
 import { positions, records, revertReason, runDecision, send, stable } from "./decisions.js";
 
 const PORT = process.env.PORT || 8080;
-const VERSION = existsSync(new URL("../VERSION", import.meta.url))
+const VERSION = process.env.APP_VERSION || process.env.RAILWAY_GIT_COMMIT_SHA?.slice(0, 7) || (existsSync(new URL("../VERSION", import.meta.url))
   ? readFileSync(new URL("../VERSION", import.meta.url), "utf8").trim()
-  : "local";
+  : "local");
 
 function limiter(max, windowMs) {
   const hits = [];
