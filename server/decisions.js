@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { BaseError, ContractFunctionRevertedError, decodeEventLog, formatUnits, keccak256, parseUnits, stringToHex, toHex } from "viem";
 import { EXPLORER, FEE, TOKENS, VAULT, agentAccount, publicClient, symbolOf, vaultAbi, vaultState, walletClient } from "./chain.js";
 import { decide } from "./serv.js";
@@ -7,6 +7,9 @@ import { decide } from "./serv.js";
 const DATA_DIR = process.env.DATA_DIR || new URL("../data/", import.meta.url).pathname.replace(/^\/(\w:)/, "$1");
 const RECORDS = `${DATA_DIR}/decisions.json`;
 mkdirSync(DATA_DIR, { recursive: true });
+// A fresh deployment volume starts with the reasoning records of decisions already made on this vault.
+const SEED = new URL("../seed/decisions.json", import.meta.url);
+if (!existsSync(RECORDS) && existsSync(SEED)) copyFileSync(SEED, RECORDS);
 export const records = existsSync(RECORDS) ? JSON.parse(readFileSync(RECORDS, "utf8")) : {};
 const saveRecords = () => writeFileSync(RECORDS, JSON.stringify(records, null, 2));
 
