@@ -129,7 +129,7 @@ function renderCalls() {
       <dl class="c-meta">
         <div><dt>Conviction</dt><dd>${meter(c.conviction)}${esc(c.conviction)}</dd></div>
         <div><dt>Catalyst</dt><dd title="${esc(c.catalyst)}">${esc(c.catalyst)}</dd></div>
-        <div><dt>Price</dt><dd>${price(c.ticker) == null ? "–" : `${fmt(price(c.ticker), 6)} WETH`}</dd></div>
+        <div><dt>Price (WETH)</dt><dd>${price(c.ticker) == null ? "–" : fmt(price(c.ticker), 6)}</dd></div>
       </dl>
       <div class="c-foot"><button class="primary" type="button" data-enter="${i}">Enter within writ</button></div>
     </article>`,
