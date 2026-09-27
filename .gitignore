@@ -10,3 +10,5 @@ PROJECT_STATE.md
 SOURCES.md
 *.log
 dist/
+data/
+data-fork/
