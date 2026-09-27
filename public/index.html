@@ -100,7 +100,7 @@
     <!-- POSITIONS -->
     <section role="tabpanel" id="panel-positions" aria-labelledby="tab-positions" hidden>
       <div class="row-head"><h2 class="big">Positions</h2><button class="ghost" id="pos-refresh" type="button">Refresh</button></div>
-      <p class="sub">The agent keeps managing what it holds. A review re-reads the entry thesis, the price since entry and the latest headlines, then SERV decides to exit or hold under the mandate.</p>
+      <p class="sub">Review a position on demand: the agent re-reads the entry thesis, the price since entry and the latest headlines, then SERV decides to exit or hold under the mandate.</p>
       <div id="positions" class="positions"></div>
     </section>
 
@@ -131,6 +131,18 @@
             <div class="ctl"><label>Deposit ETH <input id="fund-eth" inputmode="decimal" value="0.004" /></label><button class="ghost" id="fund-eth-btn" type="button">Deposit (wraps to WETH)</button></div>
             <div class="ctl"><label>Deposit TSLA <input id="fund-tsla" inputmode="decimal" value="2" /></label><button class="ghost" id="fund-tsla-btn" type="button">Deposit TSLA</button></div>
             <div class="ctl"><span class="sub" id="pause-label">Agent is active.</span><button class="ghost" id="pause-btn" type="button">Pause agent</button></div>
+            <h3>Limits and withdrawals</h3>
+            <div class="ctl">
+              <label>Asset <select id="lim-token"></select></label>
+              <label>Max per trade <input id="lim-max" inputmode="decimal" value="0.001" /></label>
+              <label>Allowed <select id="lim-allowed"><option value="true">Yes</option><option value="false">No</option></select></label>
+              <button class="ghost" id="lim-btn" type="button">Set limit</button>
+            </div>
+            <div class="ctl">
+              <label>Withdraw <select id="wd-token"></select></label>
+              <label>Amount <input id="wd-amt" inputmode="decimal" value="0.001" /></label>
+              <button class="ghost" id="wd-btn" type="button">Withdraw to owner</button>
+            </div>
           </div>
           <p class="sub visitor-note" id="visitor-note">Owner controls appear when the vault owner's wallet is connected.</p>
           <div id="owner-result" aria-live="polite"></div>

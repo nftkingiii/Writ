@@ -329,7 +329,7 @@ const chain = {
   rpcUrls: { default: { http: ["https://rpc.testnet.chain.robinhood.com"] } },
   blockExplorers: { default: { name: "Blockscout", url: "https://explorer.testnet.chain.robinhood.com" } },
 };
-const vaultWriteAbi = parseAbi(["function setMandate(string)", "function setPaused(bool)"]);
+const vaultWriteAbi = parseAbi(["function setMandate(string)", "function setPaused(bool)", "function setLimit(address,bool,uint256)", "function withdraw(address,uint256)"]);
 const erc20 = parseAbi(["function transfer(address,uint256) returns (bool)"]);
 const pub = createPublicClient({ chain, transport: http() });
 let wallet = null;
@@ -400,6 +400,16 @@ async function ownerTx(label, fn) {
 }
 
 $("#mandate-suggest").addEventListener("click", () => ($("#mandate-edit").value = SUGGESTED_MANDATE));
+$("#lim-btn").addEventListener("click", () =>
+  ownerTx(`Set ${$("#lim-token").value} limit`, () =>
+    wallet.writeContract({ address: config.vault, abi: vaultWriteAbi, functionName: "setLimit", args: [config.tokens[$("#lim-token").value], $("#lim-allowed").value === "true", parseEther($("#lim-max").value)] }),
+  ),
+);
+$("#wd-btn").addEventListener("click", () =>
+  ownerTx(`Withdraw ${$("#wd-token").value}`, () =>
+    wallet.writeContract({ address: config.vault, abi: vaultWriteAbi, functionName: "withdraw", args: [config.tokens[$("#wd-token").value], parseEther($("#wd-amt").value)] }),
+  ),
+);
 $("#mandate-save").addEventListener("click", () =>
   ownerTx("Publish mandate", () => wallet.writeContract({ address: config.vault, abi: vaultWriteAbi, functionName: "setMandate", args: [$("#mandate-edit").value.trim()] })),
 );
@@ -416,6 +426,8 @@ $("#fund-tsla-btn").addEventListener("click", () =>
   config = await api("/api/config");
   const opts = Object.keys(config.tokens).map((s) => `<option>${s}</option>`).join("");
   $("#probe-in").innerHTML = opts;
+  $("#lim-token").innerHTML = opts;
+  $("#wd-token").innerHTML = opts;
   $("#probe-out").innerHTML = opts;
   $("#probe-in").value = "WETH";
   $("#probe-out").value = "TSLA";
