@@ -263,7 +263,7 @@ async function loadPositions() {
       <div class="c-head">${av(p.ticker)}<div class="c-who"><b>${esc(p.ticker)}</b><span>${esc(NAMES[p.ticker] || "")}</span></div><span class="origin">${{ agent: "Agent entry", deposit: "Owner deposit", mixed: `Agent ${fmt(p.agentQty, 3)} + deposit` }[p.origin]}</span></div>
       <div class="big-num">${fmt(p.balance, 4)} <small class="sub">${esc(p.ticker)}</small> ${chg}</div>
       <dl class="c-meta">
-        <div><dt>Value</dt><dd>${fmt(p.valueWeth, 6)} WETH</dd></div>
+        <div><dt>Value (WETH)</dt><dd>${fmt(p.valueWeth, 6)}</dd></div>
         <div><dt>Entry</dt><dd>${p.entryPriceWeth == null ? "–" : fmt(p.entryPriceWeth, 6)}</dd></div>
         <div><dt>Now</dt><dd>${fmt(p.priceWeth, 6)}</dd></div>
       </dl>
@@ -300,7 +300,7 @@ async function loadLedger() {
   $("#ledger").innerHTML = rows
     .map(
       (r) => `<article class="entry">
-      <div class="when"><span class="stamp ${r.kind}">${r.guarded ? "Guarded" : label[r.kind]}</span><span>Block ${r.blockNumber}</span><span>Mandate v${r.mandateVersion}</span></div>
+      <div class="when"><span class="stamp ${r.kind}">${r.guarded ? "Guarded" : r.kind === "refused" && r.source === "review" ? "Held" : label[r.kind]}</span><span>Block ${r.blockNumber}</span><span>Mandate v${r.mandateVersion}</span></div>
       <div>
         <div class="what">${r.kind === "executed" ? `${fmt(r.amountIn, 6)} ${esc(r.tokenIn)} → ${fmt(r.amountOut, 6)} ${esc(r.tokenOut)}` : "No trade"}</div>
         <p class="why">${esc(r.rationale)}</p>
