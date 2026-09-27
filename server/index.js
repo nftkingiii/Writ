@@ -4,7 +4,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { randomBytes } from "node:crypto";
 import { formatUnits, keccak256, parseUnits, stringToHex, toHex } from "viem";
 import { DEPLOY_BLOCK, EXPLORER, FEE, TOKENS, VAULT, agentAccount, publicClient, symbolOf, vaultAbi, vaultState } from "./chain.js";
-import { SERV_MODEL } from "./serv.js";
+import { SERV_MODEL, decide } from "./serv.js";
 import { FEED_MODEL, callsFor, findCall, getCalls } from "./feed.js";
 import { positions, records, revertReason, runDecision, send, stable } from "./decisions.js";
 
@@ -45,9 +45,26 @@ app.get("/api/health", async (_req, res) => {
 
 app.get("/api/config", (_req, res) => res.json({ vault: VAULT, tokens: TOKENS, explorer: EXPLORER, chainId: 46630, model: SERV_MODEL, feedModel: FEED_MODEL }));
 
+// Kronos audits a new system prompt on its first use, which can take two minutes. Warm it once per mandate
+// version with a dry decision that is never recorded, so the first real click is not the slow one.
+let warmedVersion = null;
+function warmMandate(state) {
+  if (!process.env.SERV_API_KEY || warmedVersion === state.mandateVersion) return;
+  warmedVersion = state.mandateVersion;
+  const t = Date.now();
+  decide(state, "Warm-up only: no market information. Refuse.")
+    .then(() => console.log(`SERV warmed for mandate v${state.mandateVersion} in ${Date.now() - t}ms`))
+    .catch((e) => {
+      warmedVersion = null;
+      console.log(`SERV warm-up failed: ${e.message}`);
+    });
+}
+
 app.get("/api/state", async (_req, res) => {
   try {
-    res.json(await vaultState());
+    const state = await vaultState();
+    warmMandate(state);
+    res.json(state);
   } catch (e) {
     res.status(502).json({ error: `Could not read the vault: ${e.shortMessage || e.message}` });
   }
