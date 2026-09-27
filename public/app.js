@@ -260,7 +260,7 @@ async function loadPositions() {
     const e = p.entries.at(-1);
     const chg = p.changePct == null ? "" : `<span class="chg ${p.changePct >= 0 ? "up" : "down"}">${p.changePct >= 0 ? "+" : ""}${p.changePct.toFixed(2)}%</span>`;
     return `<article class="pos">
-      <div class="c-head">${av(p.ticker)}<div class="c-who"><b>${esc(p.ticker)}</b><span>${esc(NAMES[p.ticker] || "")}</span></div><span class="origin">${p.origin === "agent" ? "Agent entry" : "Owner deposit"}</span></div>
+      <div class="c-head">${av(p.ticker)}<div class="c-who"><b>${esc(p.ticker)}</b><span>${esc(NAMES[p.ticker] || "")}</span></div><span class="origin">${{ agent: "Agent entry", deposit: "Owner deposit", mixed: `Agent ${fmt(p.agentQty, 3)} + deposit` }[p.origin]}</span></div>
       <div class="big-num">${fmt(p.balance, 4)} <small class="sub">${esc(p.ticker)}</small> ${chg}</div>
       <dl class="c-meta">
         <div><dt>Value</dt><dd>${fmt(p.valueWeth, 6)} WETH</dd></div>
@@ -415,6 +415,10 @@ $("#fund-tsla-btn").addEventListener("click", () =>
   $("#probe-out").value = "TSLA";
   const want = document.getElementById(`tab-${location.hash.slice(1)}`);
   if (want) selectTab(want);
+  window.addEventListener("hashchange", () => {
+    const t = document.getElementById(`tab-${location.hash.slice(1)}`);
+    if (t && t.getAttribute("aria-selected") !== "true") selectTab(t);
+  });
   await loadState();
   loadStats();
   loadCalls();
